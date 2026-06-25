@@ -17,6 +17,10 @@ export type Country = {
   isoCode?: string;
   searchText: string;
   feature: CountryFeature;
+  marker?: {
+    longitude: number;
+    latitude: number;
+  };
 };
 
 export type ColorPalette = {
