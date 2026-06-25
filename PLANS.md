@@ -6,7 +6,7 @@ Create a responsive web application named `world-map-group-editor`.
 
 The application lets users color countries on a world map by assigning countries to editable groups. The map should be displayed at the top of the screen, and the group editing UI should be displayed below the map. The UI language must be English.
 
-Use Natural Earth `Admin 0 – Countries`, `1:110m` as the base world map data. The map should be displayed with Japan near the center.
+Use Natural Earth `Admin 0 – Countries`, `1:110m` as the base world map data. The map should be displayed with Japan near the center by default. Users should be able to change the center longitude.
 
 Place the application source code under the repository `docs/` directory. Treat `docs/` as the Vite application root.
 
@@ -42,6 +42,12 @@ Store the browser-ready map data under:
 docs/public/data/countries-110m.topojson
 ```
 
+The committed TopoJSON file must expose the country geometries as:
+
+```text
+objects.countries
+```
+
 Recommended preparation flow:
 
 1. Download Natural Earth `Admin 0 – Countries`, `1:110m` from the official Natural Earth site.
@@ -64,6 +70,8 @@ Recommended country properties:
 - Display name: `NAME_EN` if available, otherwise `NAME`
 - ISO code: `ISO_A3` if available and valid, otherwise `ADM0_A3`
 - Search fields: `NAME`, `NAME_EN`, `ISO_A3`, `ADM0_A3`
+
+Country search and assignment should only include countries present in the loaded map data. Do not show or assign countries that are not included in `objects.countries`.
 
 ## Directory Structure
 
@@ -117,7 +125,8 @@ Display the world map at the top of the page.
 
 Requirements:
 
-- Japan should appear near the center of the map.
+- Japan should appear near the center of the map by default.
+- Users should be able to change the map center longitude.
 - Countries assigned to groups should be filled with the corresponding group color.
 - Countries not assigned to any group should be filled with a neutral unassigned color.
 - The map should resize according to the viewport width.
@@ -135,6 +144,7 @@ Place the group editing UI below the map.
 
 The group editor should contain:
 
+- Map center longitude controls
 - Color palette selector
 - Group list
 - Add group button
@@ -373,6 +383,7 @@ When the user types into the text box:
 - If available, also match English country names and ISO country codes.
 - The search should be case-insensitive.
 - Matching by partial text is sufficient.
+- Show at most 10 matching candidates at a time.
 
 The candidate list should appear below or near the search text box.
 
@@ -420,6 +431,8 @@ If the country is already assigned to the same group:
 - Do not add a duplicate.
 - Show a simple warning or silently ignore the action.
 
+Show warning and validation messages near the related control or inside the related group panel. Clear a warning when the user changes the related input, selects a different candidate, or successfully completes the related action.
+
 ### Assigned Country List
 
 Each group should display a list of countries assigned to that group.
@@ -458,17 +471,64 @@ Recommended map behavior:
 - Fill each country according to its assigned group color.
 - Fill unassigned countries with the unassigned color.
 - Draw country borders.
-- Keep Japan near the center using an appropriate projection or rotation.
+- Use Japan-centered longitude by default.
+- Rotate or configure the map projection so that the selected center longitude appears near the horizontal center of the rendered map in both on-screen display and exported images.
 - Use a projection suitable for a world map, such as Natural Earth or Equal Earth.
 
 Suggested D3 projection concept:
 
 ```ts
 const projection = d3.geoNaturalEarth1()
-  .rotate([-145, 0]);
+  .rotate([-centerLongitude, 0]);
 ```
 
-Adjust the rotation and fitting so that the map is visually centered around Japan.
+Adjust the rotation and fitting so that the map is visually centered around the selected center longitude.
+
+### Map Center Longitude
+
+Place map center controls below the map and above the group list, near the color palette selector.
+
+Label:
+
+```text
+Map Center
+```
+
+Provide preset options:
+
+- Japan (`145`)
+- Europe (`10`)
+- Americas (`-95`)
+- Pacific (`180`)
+- Custom longitude
+
+Default option:
+
+```text
+Japan
+```
+
+When a preset is selected:
+
+- Use the preset longitude as the map center longitude.
+- Disable the custom longitude input.
+- Update the map immediately.
+
+When “Custom longitude” is selected:
+
+- Enable a custom longitude input.
+- Use the custom longitude for the map projection.
+- Validate that the value is a number from `-180` to `180`.
+- Show a clear validation message if the value is invalid.
+- Update the map immediately when the custom longitude is valid.
+
+Suggested validation message:
+
+```text
+Enter a longitude from -180 to 180.
+```
+
+The same selected center longitude must be used for on-screen rendering and exported images.
 
 ## Save Image Feature
 
@@ -483,6 +543,8 @@ Save As
 The user should be able to save the generated map image.
 
 The user should be able to choose the saved image size before saving.
+
+Only the map area should be exported. The group editor UI, palette selector, controls, validation messages, and page chrome must not be included in the saved image.
 
 ### Background Transparency Option
 
@@ -525,6 +587,12 @@ Default option:
 Middle
 ```
 
+Default custom width and height values:
+
+```text
+1920 × 1080
+```
+
 When a preset is selected:
 
 - Use the preset width and height for the exported PNG.
@@ -552,6 +620,8 @@ Suggested custom size limits:
 
 The saved map should preserve the selected export dimensions exactly.
 
+For every export size, fit the full world map inside the selected image dimensions while preserving the map projection shape. Empty margins are allowed when needed. The map must not be cropped or stretched.
+
 ### Export Format
 
 Export as PNG by default.
@@ -563,6 +633,8 @@ The saved file should include the current map:
 - Projection and map layout
 - Background setting, either transparent or white
 - Selected export size
+
+The exported image should contain only the rendered map SVG converted to PNG at the selected dimensions.
 
 Suggested default filename:
 
@@ -621,6 +693,14 @@ Large
 Custom
 Width
 Height
+Map Center
+Japan
+Europe
+Americas
+Pacific
+Custom longitude
+Longitude
+Enter a longitude from -180 to 180.
 Enter a valid image width and height.
 Enter a valid color in #RRGGBB format.
 This country is already assigned to another group.
@@ -653,6 +733,8 @@ type Group = {
 
 type AppState = {
   selectedPaletteId: string;
+  mapCenterMode: "japan" | "europe" | "americas" | "pacific" | "custom";
+  customCenterLongitude: number;
   groups: Group[];
   transparentBackground: boolean;
   exportSizeMode: "small" | "middle" | "large" | "custom";
@@ -668,7 +750,10 @@ A country must not be assigned to more than one group.
 The implementation is complete when the following conditions are met:
 
 - The app displays a Natural Earth `Admin 0 – Countries`, `1:110m` world map.
-- Japan appears near the center of the map.
+- Japan appears near the center of the map by default.
+- Users can choose the map center from Japan, Europe, Americas, Pacific, and Custom longitude.
+- Custom longitude accepts valid numbers from `-180` to `180`.
+- The selected map center longitude is used for both on-screen display and exported images.
 - The UI is entirely in English.
 - Three groups are shown by default.
 - Users can add groups.
@@ -691,11 +776,14 @@ The implementation is complete when the following conditions are met:
   - The custom color text input is disabled.
   - The color picker is disabled.
 - Users can search countries with incremental search.
+- Country search shows only countries included in the loaded map data.
+- Country search shows no more than 10 candidates at a time.
 - Users can add a selected country to a group with the “+” button.
 - Users can remove a selected country from a group with the “-” button.
 - A country cannot be assigned to multiple groups.
 - The map updates immediately after group, color, add-country, and remove-country changes.
 - Users can save the map image using the “Save As” button.
+- Saved images include only the map area, not the editor UI.
 - Users can choose transparent or white background when saving.
 - If transparency is disabled, the exported background is fixed to white.
 - Users can choose a saved image size from Small, Middle, Large, and Custom.
@@ -703,7 +791,9 @@ The implementation is complete when the following conditions are met:
 - Middle exports at `1920 × 1080`.
 - Large exports at `3840 × 2160`.
 - Custom export size uses user-provided width and height.
+- Custom export size defaults to `1920 × 1080`.
 - Invalid custom export sizes are not saved and show a validation message.
+- Exported maps fit inside the selected dimensions without cropping or stretching.
 - The app is responsive and usable on smartphones.
 
 ## Implementation Notes
@@ -719,6 +809,14 @@ Recommended stack:
 - TopoJSON or GeoJSON for map data
 
 Use `docs/` as the application root. Run package manager, development server, build, and test commands from `docs/`.
+
+Configure Vite for static deployment from the repository `docs/` application root. Prefer:
+
+```ts
+base: "./"
+```
+
+This keeps built asset and data URLs relative, so the app works when served from a subdirectory such as GitHub Pages. Continue using `import.meta.env.BASE_URL` when loading `data/countries-110m.topojson`.
 
 Keep the code modular:
 
