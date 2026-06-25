@@ -482,6 +482,8 @@ Save As
 
 The user should be able to save the generated map image.
 
+The user should be able to choose the saved image size before saving.
+
 ### Background Transparency Option
 
 Provide a checkbox or similar control near the “Save As” button.
@@ -500,6 +502,56 @@ When saving the image:
   - Save the image with a white background.
   - The background color must be fixed to `#FFFFFF`.
 
+### Export Size
+
+Provide an export size selector near the “Save As” button.
+
+Label:
+
+```text
+Image Size
+```
+
+The user can choose one of the following options:
+
+- Small (`1280 × 720`)
+- Middle (`1920 × 1080`)
+- Large (`3840 × 2160`)
+- Custom
+
+Default option:
+
+```text
+Middle
+```
+
+When a preset is selected:
+
+- Use the preset width and height for the exported PNG.
+- Disable the custom width and custom height inputs.
+
+When “Custom” is selected:
+
+- Enable custom width and custom height inputs.
+- Use the custom width and height for the exported PNG.
+- Validate that both values are positive whole numbers.
+- Show a clear validation message if either value is invalid.
+
+Suggested validation message:
+
+```text
+Enter a valid image width and height.
+```
+
+Suggested custom size limits:
+
+- Minimum width: `320`
+- Minimum height: `180`
+- Maximum width: `7680`
+- Maximum height: `4320`
+
+The saved map should preserve the selected export dimensions exactly.
+
 ### Export Format
 
 Export as PNG by default.
@@ -510,6 +562,7 @@ The saved file should include the current map:
 - Country borders
 - Projection and map layout
 - Background setting, either transparent or white
+- Selected export size
 
 Suggested default filename:
 
@@ -561,6 +614,14 @@ Add Group
 Delete Group
 Save As
 Transparent background
+Image Size
+Small
+Middle
+Large
+Custom
+Width
+Height
+Enter a valid image width and height.
 Enter a valid color in #RRGGBB format.
 This country is already assigned to another group.
 Delete this group?
@@ -594,6 +655,9 @@ type AppState = {
   selectedPaletteId: string;
   groups: Group[];
   transparentBackground: boolean;
+  exportSizeMode: "small" | "middle" | "large" | "custom";
+  customExportWidth: number;
+  customExportHeight: number;
 };
 ```
 
@@ -634,6 +698,12 @@ The implementation is complete when the following conditions are met:
 - Users can save the map image using the “Save As” button.
 - Users can choose transparent or white background when saving.
 - If transparency is disabled, the exported background is fixed to white.
+- Users can choose a saved image size from Small, Middle, Large, and Custom.
+- Small exports at `1280 × 720`.
+- Middle exports at `1920 × 1080`.
+- Large exports at `3840 × 2160`.
+- Custom export size uses user-provided width and height.
+- Invalid custom export sizes are not saved and show a validation message.
 - The app is responsive and usable on smartphones.
 
 ## Implementation Notes
