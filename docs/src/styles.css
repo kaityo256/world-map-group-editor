@@ -44,6 +44,7 @@ select:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   margin-bottom: 12px;
 }
 
@@ -52,6 +53,29 @@ select:disabled {
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: 0;
+}
+
+.repo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  padding: 0 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.repo-link:hover,
+.repo-link:focus {
+  border-color: #94a3b8;
+  background: #f8fafc;
 }
 
 .map-panel {
@@ -363,6 +387,15 @@ select:disabled {
 
   .app-header h1 {
     font-size: 1.12rem;
+  }
+
+  .repo-link {
+    width: 36px;
+    padding: 0;
+  }
+
+  .repo-link span {
+    display: none;
   }
 
   .control-strip,

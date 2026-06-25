@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Github } from "lucide-react";
 import { ColorPaletteSelector } from "./components/ColorPaletteSelector";
 import { exportSizePresets, ExportControls } from "./components/ExportControls";
 import { GroupEditor } from "./components/GroupEditor";
@@ -172,6 +173,15 @@ export default function App() {
     <main className="app-shell">
       <header className="app-header">
         <h1>World Map Group Editor</h1>
+        <a
+          className="repo-link"
+          href="https://github.com/kaityo256/world-map-group-editor"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <Github size={18} aria-hidden="true" />
+          <span>GitHub</span>
+        </a>
       </header>
 
       <MapView countries={countries} countryColors={countryColors} centerLongitude={centerLongitude} isLoading={loading} error={loadError} />
