@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "postbuild": "node scripts/sync-pages-build.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
