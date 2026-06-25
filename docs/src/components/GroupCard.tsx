@@ -1,5 +1,5 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ColorPalette, Country, Group } from "../data/types";
 import { CountrySearch, countryLabel } from "./CountrySearch";
 
@@ -50,6 +50,16 @@ export function GroupCard({
 
   const customColorInvalid = group.customColorEnabled && !hexColorPattern.test(group.customColor);
   const selectedColorIndex = Math.min(group.paletteColorIndex, palette.colors.length - 1);
+
+  useEffect(() => {
+    if (assignedCountries.length === 1) {
+      setSelectedAssignedId(assignedCountries[0].id);
+      return;
+    }
+    if (selectedAssignedId && !assignedCountries.some((country) => country.id === selectedAssignedId)) {
+      setSelectedAssignedId(undefined);
+    }
+  }, [assignedCountries, selectedAssignedId]);
 
   function handleAddCountry() {
     if (!pendingCountry) return;

@@ -73,6 +73,8 @@ Recommended country properties:
 
 Country search and assignment should only include countries present in the loaded map data. Do not show or assign countries that are not included in `objects.countries`.
 
+For countries or territories that are too small to be represented legibly as polygons at this map scale, the application may add them as explicit point-marker country records. These records should use stable country IDs and searchable names/codes like polygon countries, and should be assignable to groups in the same way. Point-marker country records are an intentional exception to the `objects.countries` polygon-only rule.
+
 ## Directory Structure
 
 Use the following directory structure:
@@ -472,6 +474,7 @@ Recommended map behavior:
 - Fill each country according to its assigned group color.
 - Fill unassigned countries with the unassigned color.
 - Draw country borders.
+- For countries represented by point markers instead of polygons, draw a small filled circular marker at the country coordinate only when that country is assigned to a group.
 - Use Japan-centered longitude by default.
 - Rotate or configure the map projection so that the selected center longitude appears near the horizontal center of the rendered map in both on-screen display and exported images.
 - Use a projection suitable for a world map, such as Natural Earth or Equal Earth.
@@ -783,7 +786,7 @@ The implementation is complete when the following conditions are met:
   - The custom color text input is disabled.
   - The color picker is disabled.
 - Users can search countries with incremental search.
-- Country search shows only countries included in the loaded map data.
+- Country search shows only countries included in the loaded map data, including explicitly defined point-marker country records.
 - Country search shows no more than 10 candidates at a time.
 - Users can add a selected country to a group with the “+” button.
 - Users can remove a selected country from a group with the “-” button.
