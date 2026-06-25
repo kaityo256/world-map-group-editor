@@ -318,6 +318,7 @@ When “Custom” is unchecked:
 - Disable the custom color text input.
 - Disable the color picker.
 - The selected color comes from the currently selected color palette.
+- When the user changes the color dropdown, update the group color and map immediately.
 
 ### Custom Color Mode
 
@@ -781,7 +782,7 @@ The implementation is complete when the following conditions are met:
 - Users can add a selected country to a group with the “+” button.
 - Users can remove a selected country from a group with the “-” button.
 - A country cannot be assigned to multiple groups.
-- The map updates immediately after group, color, add-country, and remove-country changes.
+- The map updates immediately after group, color, add-country, remove-country, and map center longitude changes.
 - Users can save the map image using the “Save As” button.
 - Saved images include only the map area, not the editor UI.
 - Users can choose transparent or white background when saving.
