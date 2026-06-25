@@ -643,7 +643,13 @@ Suggested default filename:
 world-map-groups.png
 ```
 
-If possible, allow the user to specify a filename when saving.
+When the user clicks “Save As”:
+
+- Open the system file save dialog when the browser supports it.
+- Use `world-map-groups.png` as the suggested filename.
+- Save the PNG to the location and filename chosen by the user.
+- If the user cancels the system file save dialog, do not save the image.
+- If the browser does not support the system file save dialog, fall back to downloading `world-map-groups.png`.
 
 ## Responsive Design
 
@@ -784,6 +790,8 @@ The implementation is complete when the following conditions are met:
 - A country cannot be assigned to multiple groups.
 - The map updates immediately after group, color, add-country, remove-country, and map center longitude changes.
 - Users can save the map image using the “Save As” button.
+- When saving, supported browsers open the system file save dialog.
+- The saved PNG uses the location and filename chosen in the system dialog.
 - Saved images include only the map area, not the editor UI.
 - Users can choose transparent or white background when saving.
 - If transparency is disabled, the exported background is fixed to white.
